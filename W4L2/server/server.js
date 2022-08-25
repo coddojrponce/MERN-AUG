@@ -15,7 +15,7 @@ app.get('/users',(req,res)=>{
 
 
 
-app.post('/todo',(req,res)=>{
+app.post('/users',(req,res)=>{
     const user = {
         userId: faker.datatype.uuid(),
         name:faker.internet.userName(),
