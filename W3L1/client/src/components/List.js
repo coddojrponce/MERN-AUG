@@ -7,7 +7,7 @@ const List = (props) => {
 
 const clickHandler = (index)=>{
 
-    const list = todoList
+    const list = [...todoList]
     // console.log(list)
     const obj = list[index]
     console.log(obj)
