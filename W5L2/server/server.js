@@ -1,12 +1,94 @@
+require('dotenv').config()
 const express = require('express')
 const app = express()
 const port = 8000
+const mongoose = require('mongoose')
+const {DB_PASSWORD} = process.env
 
+// important stuff
 app.use(express.json())
 
-require("./config/mongoose.config")
+mongoose.connect(`mongodb+srv://rponce:${DB_PASSWORD}@cluster0.93fblcz.mongodb.net/?retryWrites=true&w=majority`)
+.then(()=>{
+    console.log("successfully connected to the DB")
+})
+.catch((err)=>{
+    console.log("There has been an error connecting to the db")
+})
 
-require('./routes/user.routes')(app)
 
+//model
+
+const UserSchema = new mongoose.Schema({
+    name:String,
+    email:String,
+    
+},
+    {timestamps:true})
+
+const User = mongoose.model("User",UserSchema)
+
+
+//Create
+
+app.post('/api/v1/users',(req,res)=>{    
+    User.create(req.body)
+    .then((user)=>{
+        res.json({user:user})
+    })
+    .catch((err)=>{
+        res.json({message:"There has been an error",error:err})
+    })
+
+
+})
+
+//Read
+
+app.get('/api/v1/users',(req,res)=>{
+    User.find({})
+    .then((users)=>{
+        res.json({users:users})
+    })
+    .catch((err)=>{
+        res.json({message:"There has been an error",error:err})
+    })
+})
+
+app.get('/api/v1/users/:id',(req,res)=>{
+    User.find({_id:req.params.id})
+    .then((user)=>{
+        res.json({user:user})
+    })
+    .catch((err)=>{
+        res.json({message:"There has been an error",error:err})
+    })
+})
+
+
+//Update
+
+app.put('/api/v1/users/:id',(req,res)=>{
+    User.findOneAndUpdate({_id:req.params.id},req.body,{new:true})
+    .then((user)=>{
+        res.json({updatedUser:user})
+    })
+    .catch((err)=>{
+        res.json({message:"There has been an error",error:err})
+    })
+})
+
+
+//Destroy
+
+app.delete('/api/v1/users/:id',(req,res)=>{
+    User.findOneAndDelete(req.params.id)
+    .then((user)=>{
+        res.json({deletedUser:user})
+    })
+    .catch((err)=>{
+        res.json({message:"There has been an error",error:err})
+    })
+})
 
 app.listen(port,()=>console.log(`Locked and loaded on port ${port}`))
